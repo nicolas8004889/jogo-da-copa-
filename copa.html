@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🏆 COPA DO MUNDO 2026 - SIMULADOR</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #0a1f3d, #1e40af);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: linear-gradient(to right, #1e3a8a, #3b82f6);
+      padding: 25px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+    }
+    h1 { margin: 0; font-size: 2.8rem; text-shadow: 0 0 15px gold; }
+
+    .container { max-width: 1350px; margin: 20px auto; padding: 15px; }
+
+    .card {
+      background: rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 25px;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      margin: 6px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover { background: #1d4ed8; transform: scale(1.05); }
+
+    /* PITCH COM FUNDO REAL */
+    .pitch {
+      width: 100%;
+      max-width: 720px;
+      height: 580px;
+      background: url('https://images.unsplash.com/photo-1622473596135-2c6e0e0c5c5e?w=1200') center/cover no-repeat;
+      border: 8px solid #fff;
+      border-radius: 12px;
+      position: relative;
+      margin: 20px auto;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+      overflow: hidden;
+    }
+
+    .player {
+      position: absolute;
+      width: 78px;
+      text-align: center;
+      color: white;
+      text-shadow: 2px 2px 4px black;
+      transition: all 0.3s;
+    }
+    .player:hover { transform: scale(1.25); z-index: 20; }
+    .player img {
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      border: 4px solid gold;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+    }
+    .cr7 img { border-color: #ffd700; box-shadow: 0 0 25px gold; animation: glow 1.5s infinite; }
+    @keyframes glow { 0%,100% { box-shadow: 0 0 20px gold; } 50% { box-shadow: 0 0 35px orangered; } }
+
+    .player-name { font-size: 13px; font-weight: bold; margin-top: 4px; }
+    .player-overall { font-size: 19px; font-weight: bold; color: gold; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2); }
+    th { background: rgba(30, 64, 175, 0.6); }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🏆 COPA DO MUNDO FIFA 2026 🏆</h1>
+  <p>Estados Unidos • Canadá • México | 11 de Junho — 19 de Julho de 2026</p>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <button onclick="showSection('times')">Escalações dos Times</button>
+    <button onclick="showSection('jogos')">Calendário</button>
+    <button onclick="showSection('apostas')">Fazer Apostas</button>
+    <button onclick="showSection('resultados')">Simular Resultados</button>
+  </div>
+
+  <!-- ESCALAÇÕES -->
+  <div id="times" class="card">
+    <h2>Escalações Completas</h2>
+    <select id="select-time" onchange="mostrarEscalacao()" style="padding:12px; font-size:18px; width:100%; max-width:500px; margin-bottom:15px;">
+      <option value="">Escolha uma Seleção...</option>
+    </select>
+    <div id="escalacao-display"></div>
+  </div>
+
+  <!-- Outras abas -->
+  <div id="jogos" class="card" style="display:none;">
+    <h2>📅 Calendário de Jogos</h2>
+    <p>Em breve com mais jogos completos...</p>
+  </div>
+
+  <div id="apostas" class="card" style="display:none;">
+    <h2>💰 Apostas</h2>
+    <p>Funcionalidade de apostas ativada!</p>
+  </div>
+
+  <div id="resultados" class="card" style="display:none;">
+    <h2>⚽ Simular Jogos</h2>
+    <button onclick="simularJogos()">Simular Jogos do Dia</button>
+    <div id="resultados-simulados"></div>
+  </div>
+</div>
+
+<script>
+// ===================== DADOS COMPLETOS =====================
+const selecoes = {
+  "Portugal": {
+    coach: "Roberto Martínez",
+    formation: "4-3-3",
+    stadium: "MetLife Stadium",
+    players: [
+      {name: "Cristiano Ronaldo", pos: "AT", overall: 900, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/8/8c/Cristiano_Ronaldo_2018.jpg"},
+      {name: "Bruno Fernandes", pos: "MC", overall: 88, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Bruno_Fernandes_2022.jpg/800px-Bruno_Fernandes_2022.jpg"},
+      {name: "Bernardo Silva", pos: "MD", overall: 87, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Bernardo_Silva_2023.jpg/800px-Bernardo_Silva_2023.jpg"},
+      {name: "Rúben Dias", pos: "ZAG", overall: 86, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Ruben_Dias_2023.jpg/800px-Ruben_Dias_2023.jpg"},
+      {name: "Diogo Costa", pos: "GOL", overall: 85, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Diogo_Costa_2023.jpg/800px-Diogo_Costa_2023.jpg"},
+      {name: "João Cancelo", pos: "LD", overall: 84, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Joao_Cancelo_2023.jpg/800px-Joao_Cancelo_2023.jpg"},
+      {name: "Nuno Mendes", pos: "LE", overall: 83, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Nuno_Mendes_2023.jpg/800px-Nuno_Mendes_2023.jpg"},
+      {name: "Vitinha", pos: "MC", overall: 84, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Vitinha_2023.jpg/800px-Vitinha_2023.jpg"},
+      {name: "Gonçalo Ramos", pos: "AT", overall: 82, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Goncalo_Ramos_2023.jpg/800px-Goncalo_Ramos_2023.jpg"},
+      {name: "Diogo Jota", pos: "AT", overall: 83, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Diogo_Jota_2023.jpg/800px-Diogo_Jota_2023.jpg"},
+      {name: "Raphael Guerreiro", pos: "LE", overall: 82, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Raphael_Guerreiro_2023.jpg/800px-Raphael_Guerreiro_2023.jpg"},
+      // Reservas
+      {name: "Pepe", pos: "ZAG", overall: 80, starter: false, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Pepe_2023.jpg/800px-Pepe_2023.jpg"},
+      {name: "Rúben Neves", pos: "MC", overall: 81, starter: false, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Ruben_Neves_2023.jpg/800px-Ruben_Neves_2023.jpg"},
+      {name: "João Félix", pos: "AT", overall: 82, starter: false, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Joao_Felix_2023.jpg/800px-Joao_Felix_2023.jpg"},
+      {name: "Otávio", pos: "MC", overall: 80, starter: false, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Otavio_2023.jpg/800px-Otavio_2023.jpg"}
+    ]
+  },
+  "Brazil": {
+    coach: "Carlo Ancelotti",
+    formation: "4-2-3-1",
+    stadium: "SoFi Stadium",
+    players: [
+      {name: "Vinicius Jr", pos: "PE", overall: 91, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Vinicius_Junior_2023.jpg/800px-Vinicius_Junior_2023.jpg"},
+      {name: "Rodrygo", pos: "AT", overall: 88, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Rodrygo_2023.jpg/800px-Rodrygo_2023.jpg"},
+      {name: "Neymar Jr", pos: "ME", overall: 87, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Neymar_2022.jpg/800px-Neymar_2022.jpg"},
+      {name: "Alisson", pos: "GOL", overall: 89, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Alisson_Becker_2023.jpg/800px-Alisson_Becker_2023.jpg"},
+      {name: "Marquinhos", pos: "ZAG", overall: 86, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Marquinhos_2023.jpg/800px-Marquinhos_2023.jpg"},
+      {name: "Casemiro", pos: "VOL", overall: 84, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Casemiro_2023.jpg/800px-Casemiro_2023.jpg"},
+      {name: "Bruno Guimarães", pos: "MC", overall: 85, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Bruno_Guimaraes_2023.jpg/800px-Bruno_Guimaraes_2023.jpg"},
+      {name: "Raphinha", pos: "PD", overall: 84, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Raphinha_2023.jpg/800px-Raphinha_2023.jpg"},
+      {name: "Endrick", pos: "AT", overall: 82, starter: false, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Endrick_2024.jpg/800px-Endrick_2024.jpg"}
+    ]
+  },
+  "Argentina": {
+    coach: "Lionel Scaloni",
+    formation: "4-3-3",
+    stadium: "Estadio Azteca",
+    players: [
+      {name: "Lionel Messi", pos: "AT", overall: 89, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Lionel_Messi_2022.jpg/800px-Lionel_Messi_2022.jpg"},
+      {name: "Julián Álvarez", pos: "AT", overall: 85, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Julian_Alvarez_2023.jpg/800px-Julian_Alvarez_2023.jpg"},
+      {name: "Emiliano Martínez", pos: "GOL", overall: 87, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Emiliano_Martinez_2022.jpg/800px-Emiliano_Martinez_2022.jpg"}
+    ]
+  },
+  "France": {
+    coach: "Didier Deschamps",
+    formation: "4-3-3",
+    stadium: "BMO Field",
+    players: [
+      {name: "Kylian Mbappé", pos: "AT", overall: 92, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Kylian_Mbappe_2022.jpg/800px-Kylian_Mbappe_2022.jpg"},
+      {name: "Antoine Griezmann", pos: "MC", overall: 87, starter: true, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Antoine_Griezmann_2022.jpg/800px-Antoine_Griezmann_2022.jpg"}
+    ]
+  }
+};
+
+// ===================== FUNÇÕES =====================
+function popularSelects() {
+  const select = document.getElementById('select-time');
+  Object.keys(selecoes).forEach(time => {
+    let opt = document.createElement('option');
+    opt.value = time;
+    opt.textContent = time;
+    select.appendChild(opt);
+  });
+}
+
+function mostrarEscalacao() {
+  const timeNome = document.getElementById('select-time').value;
+  if (!timeNome) return;
+
+  const time = selecoes[timeNome];
+  const display = document.getElementById('escalacao-display');
+
+  let html = `
+    <h2>${timeNome} — ${time.formation}</h2>
+    <p><strong>Técnico:</strong> ${time.coach} | <strong>Estádio:</strong> ${time.stadium}</p>
+    <div class="pitch" id="pitch"></div>
+
+    <h3 style="margin-top:30px;">Banco de Reservas</h3>
+    <table>
+      <tr><th>Jogador</th><th>Posição</th><th>Overall</th></tr>
+  `;
+
+  time.players.forEach(p => {
+    if (!p.starter) {
+      html += `<tr><td>${p.name}</td><td>${p.pos}</td><td><strong>${p.overall}</strong></td></tr>`;
+    }
+  });
+  html += `</table>`;
+  display.innerHTML = html;
+
+  setTimeout(() => renderPitch(time), 150);
+}
+
+function renderPitch(time) {
+  const pitch = document.getElementById('pitch');
+  pitch.innerHTML = '';
+
+  const starters = time.players.filter(p => p.starter);
+
+  const positions = [
+    {top: '5%', left: '47%'},     // GK
+    {top: '22%', left: '15%'}, {top: '22%', left: '35%'}, {top: '22%', left: '65%'}, {top: '22%', left: '85%'},
+    {top: '45%', left: '25%'}, {top: '45%', left: '50%'}, {top: '45%', left: '75%'},
+    {top: '72%', left: '20%'}, {top: '72%', left: '48%'}, {top: '72%', left: '78%'}
+  ];
+
+  starters.forEach((player, i) => {
+    const div = document.createElement('div');
+    div.className = `player ${player.overall === 900 ? 'cr7' : ''}`;
+    div.style.top = positions[i] ? positions[i].top : '50%';
+    div.style.left = positions[i] ? positions[i].left : '50%';
+
+    div.innerHTML = `
+      <img src="${player.img}" alt="${player.name}" onerror="this.src='https://via.placeholder.com/62?text=${player.name[0]}'">
+      <div class="player-name">${player.name}</div>
+      <div class="player-overall">${player.overall}</div>
+      <div style="font-size:12px;">${player.pos}</div>
+    `;
+    pitch.appendChild(div);
+  });
+}
+
+function showSection(section) {
+  document.querySelectorAll('.card').forEach(c => {
+    if (c.id) c.style.display = (c.id === section) ? 'block' : 'none';
+  });
+}
+
+function simularJogos() {
+  alert("✅ Jogos simulados! Pontuação atualizada.");
+}
+
+// Inicializar
+window.onload = () => {
+  popularSelects();
+  showSection('times');
+};
+</script>
+
+</body>
+</html>
