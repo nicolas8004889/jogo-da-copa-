@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Copa 2026</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#0a1520;
+color:white;
+}
+
+header{
+height:50vh;
+display:flex;
+justify-content:center;
+align-items:center;
+text-align:center;
+background:linear-gradient(#001,#022);
+}
+
+h1{
+font-size:50px;
+}
+
+.selecoes{
+display:flex;
+justify-content:center;
+gap:20px;
+flex-wrap:wrap;
+padding:30px;
+}
+
+.time{
+width:180px;
+padding:20px;
+background:#162434;
+border-radius:20px;
+cursor:pointer;
+text-align:center;
+transition:.4s;
+}
+
+.time:hover{
+transform:scale(1.05);
+border:2px solid #00ff88;
+}
+
+#painel{
+display:none;
+padding:30px;
+}
+
+.info{
+display:flex;
+justify-content:center;
+gap:20px;
+margin-bottom:30px;
+flex-wrap:wrap;
+}
+
+.box{
+background:#162434;
+padding:15px;
+border-radius:10px;
+}
+
+.campo{
+position:relative;
+height:700px;
+border-radius:20px;
+background:#1b7d2b;
+overflow:hidden;
+}
+
+/* linhas do campo */
+
+.campo:before{
+content:"";
+position:absolute;
+width:300px;
+height:300px;
+border:4px solid white;
+border-radius:50%;
+left:50%;
+top:50%;
+transform:translate(-50%,-50%);
+}
+
+.player{
+
+position:absolute;
+transform:translate(-50%,-50%);
+text-align:center;
+
+}
+
+.player img{
+
+width:70px;
+height:70px;
+border-radius:50%;
+border:3px solid #00ff88;
+
+}
+
+.card{
+
+background:black;
+padding:5px;
+border-radius:10px;
+font-size:12px;
+
+}
+
+</style>
+</head>
+<body>
+
+<header>
+
+<div>
+
+<h1>🏆 Copa do Mundo 2026</h1>
+
+<p>Escolha uma seleção</p>
+
+</div>
+
+</header>
+
+<div class="selecoes">
+
+<div class="time" onclick="abrir('brasil')">
+🇧🇷
+<h2>Brasil</h2>
+</div>
+
+<div class="time" onclick="abrir('portugal')">
+🇵🇹
+<h2>Portugal</h2>
+</div>
+
+</div>
+
+
+<div id="painel">
+
+<div class="info">
+
+<div class="box" id="tec"></div>
+
+<div class="box" id="form"></div>
+
+</div>
+
+<div class="campo" id="campo">
+
+</div>
+
+</div>
+
+<script>
+
+const selecoes={
+
+brasil:{
+
+tecnico:"👨‍🏫 Técnico: Dorival Jr",
+
+formacao:"⚽ Formação: 4-3-3",
+
+jogadores:[
+
+["Alisson","GK",90,50,90],
+["Marquinhos","CB",89,30,70],
+["Militão","CB",88,70,70],
+["Casemiro","CDM",89,50,55],
+["Paquetá","CM",87,35,45],
+["Vini Jr","ST",92,50,20]
+
+]
+
+},
+
+portugal:{
+
+tecnico:"👨‍🏫 Técnico: Roberto Martínez",
+
+formacao:"⚽ Formação: 4-3-3",
+
+jogadores:[
+
+["Diogo Costa","GK",90,50,90],
+["Ruben Dias","CB",90,30,70],
+["Pepe","CB",88,70,70],
+["Bruno Fernandes","CAM",91,35,45],
+["Bernardo Silva","CM",90,65,45],
+["Cristiano Ronaldo","ST",93,50,20]
+
+]
+
+}
+
+}
+
+function abrir(nome){
+
+document.getElementById("painel")
+.style.display="block"
+
+let s=selecoes[nome]
+
+tec.innerHTML=s.tecnico
+form.innerHTML=s.formacao
+
+campo.innerHTML=""
+
+s.jogadores.forEach(j=>{
+
+campo.innerHTML+=`
+
+<div class='player'
+style='left:${j[3]}%;top:${j[4]}%'>
+
+<img src='https://via.placeholder.com/70'>
+
+<div class='card'>
+
+${j[0]}<br>
+
+${j[1]} | OVR ${j[2]}
+
+</div>
+
+</div>
+
+`
+
+})
+
+}
+
+</script>
+
+</body>
+</html>
